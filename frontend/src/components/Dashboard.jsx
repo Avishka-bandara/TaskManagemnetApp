@@ -24,7 +24,7 @@ function Dashboard() {
 
     const fetchUser = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/fetch-user', config);
+            const res = await axios.get('http://localhost:8000/api/fetch-auth', config);
             setUser({ name: res.data.name, email: res.data.email });
         } catch (err) {
             console.error('Fetch user failed', err);

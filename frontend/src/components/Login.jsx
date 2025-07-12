@@ -12,26 +12,32 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    try {
-      const res = await axios.post('http://localhost:8000/api/login', {
-        email,
-        password,
-      });
+     try {
+    const res = await axios.post('http://localhost:8000/api/login', {
+      email,
+      password,
+    });
 
-      const token = res.data.token;
+    const token = res.data.token;
+    localStorage.setItem('token', token);
 
-      localStorage.setItem('token', token);
-      setError('');
-      localStorage.setItem("role", res.data.user.role); 
-      if (res.data.user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
+    // Fetch user info now
+    const userRes = await axios.get('http://localhost:8000/api/fetch-user', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+    const role = userRes.data.role;
+    localStorage.setItem('role', role);
+
+    setError('');
+    if (role === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/dashboard');
     }
+  } catch (err) {
+    setError(err.response?.data?.message || 'Login failed');
+  }
   };
 
   return (

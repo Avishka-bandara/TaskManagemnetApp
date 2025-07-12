@@ -16,22 +16,26 @@ function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    // fetchTasks();
     fetchUsers();
   }, []);
 
-  const fetchTasks = async () => {
-    try {
-      const res = await axios.get('http://localhost:8000/api/tasks', config); // You should have this route for admin
-      setTasks(res.data);
-    } catch (err) {
-      console.error('Failed to fetch tasks', err);
-    }
-  };
+  // const fetchTasks = async () => {
+  //   try {
+  //     const res = await axios.get('http://localhost:8000/api/user/tasks', config); // You should have this route for admin
+  //     setTasks(res.data);
+  //   } catch (err) {
+  //     console.error('Failed to fetch tasks', err);
+  //   }
+  // };
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/users', config); // You should create this route to get all users
+      const res = await axios.get('http://localhost:8000/api/users', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }); 
       setUsers(res.data);
     } catch (err) {
       console.error('Failed to fetch users', err);
@@ -53,7 +57,7 @@ function AdminDashboard() {
       await axios.post('http://localhost:8000/api/task', taskForm, config);
       alert('Task created successfully');
       setTaskForm({ title: '', description: '', due_date: '', assigned_user_id: '' });
-      fetchTasks();
+      // fetchTasks();
     } catch (err) {
       console.error('Failed to create task', err);
       alert('Task creation failed');
@@ -74,23 +78,26 @@ function AdminDashboard() {
 
       {/* Create Task Form */}
       <div className="container mt-4">
+        <div className="card p-3 mb-5" style={{ backgroundColor: '#f8f9fa' }}>
         <h4>Create New Task</h4>
-        <form onSubmit={handleCreateTask} className="mb-5">
+        <form onSubmit={handleCreateTask} className="mb-2">
           <div className="row">
             <div className="col-md-6 mb-3">
               <label>Title</label>
               <input type="text" name="title" className="form-control" required value={taskForm.title} onChange={handleTaskChange} />
             </div>
+            
             <div className="col-md-6 mb-3">
               <label>Due Date</label>
               <input type="date" name="due_date" className="form-control" required value={taskForm.due_date} onChange={handleTaskChange} />
             </div>
           </div>
-          <div className="mb-3">
+          <div className="row">
+          <div className="col-md-6 mb-3">
             <label>Description</label>
             <textarea name="description" className="form-control" required value={taskForm.description} onChange={handleTaskChange}></textarea>
           </div>
-          <div className="mb-3">
+          <div className="col-md-6 mb-3">
             <label>Assign To</label>
             <select name="assigned_user_id" className="form-select" required value={taskForm.assigned_user_id} onChange={handleTaskChange}>
               <option value="">Select User</option>
@@ -98,13 +105,15 @@ function AdminDashboard() {
                 <option key={user.id} value={user.id}>{user.name} ({user.email})</option>
               ))}
             </select>
+              </div>
           </div>
-          <button type="submit" className="btn text-white" style={{ backgroundColor: '#0f214d' }}>Create Task</button>
+          <button type="submit" className="btn text-white col-md-2" style={{ backgroundColor: '#0f214d' }}>Create Task</button>
         </form>
+        </div>
 
         {/* Task Table */}
         <h4>All Tasks</h4>
-        <table className="table table-bordered table-striped mb-5">
+        <table className="table table-bordered table-striped mb-5 mt-3">
           <thead className="table-primary">
             <tr>
               <th>#</th>
@@ -120,13 +129,13 @@ function AdminDashboard() {
               <tr key={task.id}>
                 <td>{index + 1}</td>
                 <td>{task.title}</td>
-                <td>{task.assigned_user?.name || 'Unassigned'}</td>
+                <td>{task.user?.name || 'Unassigned'}</td>
                 <td>{task.status}</td>
                 <td>{task.progress || 'Not started'}</td>
                 <td>{task.due_date}</td>
               </tr>
             )) : (
-              <tr><td colSpan="6">No tasks found</td></tr>
+              <tr><td colSpan="6" className="text-center">No tasks found</td></tr>
             )}
           </tbody>
         </table>
@@ -134,7 +143,7 @@ function AdminDashboard() {
         {/* User Table */}
         <h4>All Users</h4>
         <table className="table table-bordered table-striped">
-          <thead className="table-secondary">
+          <thead className="table-primary">
             <tr>
               <th>#</th>
               <th>Name</th>
@@ -151,7 +160,7 @@ function AdminDashboard() {
                 <td>{user.role}</td>
               </tr>
             )) : (
-              <tr><td colSpan="4">No users found</td></tr>
+              <tr><td colSpan="4" className="text-center">No users found</td></tr>
             )}
           </tbody>
         </table>
