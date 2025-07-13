@@ -36,3 +36,24 @@
     transform: rotate(360deg);
   }
 }
+.navbar-items {
+  display: flex;
+  align-items: end;
+  justify-content: space-evenly;
+  width: 100%;
+  padding: 0 15px;
+}
+
+
+body {
+  overflow-x: hidden;
+}
+
+#home-btn:hover, #add-user-btn:hover, #logout-btn:hover{
+  background-color: #61dafb;
+  color: #282c34;
+  transition: background-color 0.5s ease, color 1.0s ease ,box-shadow 0.4s ease;
+  /* border: none; */
+  cursor: pointer;
+  box-shadow: 0px 0px 18px rgba(75, 219, 224, 0.96);
+}

@@ -33,20 +33,36 @@ class TaskController extends Controller
     }
 
     public function updateTask(Request $request, $id){
-        $task = Task::findOrFail($id);
-
-        $validate = $request->validate([
-            'status' => 'required|string|in:in_progress,completed',
-
-        ]);
-        $task->update([
-            'status' => $request->status,
-        ]);
+        
+        if(Auth()->user()->role !== 'admin'){
+            $task = Task::findOrFail($id);
+            $validate = $request->validate([
+                'status' => 'required|string|in:in_progress,completed',
+    
+            ]);
+            $task->update([
+                'status' => $request->status,
+            ]);
+            return response()->json([
+                'message' => 'Task updated successfully',
+                'task' => $task,
+            ]);
+        }else{
+            $task = Task::findOrFail($id);
+            $task->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'due_date' => $request->due_date,
+                'user_id' => $request->user_id,
+            ]);
+        }
 
         return response()->json([
             'message' => 'Task updated successfully',
             'task' => $task,
-        ]);
+]);
+
+
     }
 
 

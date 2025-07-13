@@ -55,11 +55,11 @@ function Login() {
             <input type="password" className="form-control" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <button type="submit" className="btn w-100 text-white" style={{ backgroundColor: '#0f214d' }}>Login</button>
-          <div className="text-center mt-3">
+          {/* <div className="text-center mt-3">
             <small>
               Don't have an account? <a href="/register" style={{ color: '#0f214d' }}>Register</a>
             </small>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>

@@ -1,61 +1,65 @@
-// src/components/Register.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getToken } from '../services/Auth';
+import { useNavigate } from 'react-router-dom';
 
-function Register() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+function RegisterUser() {
   const navigate = useNavigate();
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    try {      
-      
-      await axios.post('http://localhost:8000/api/register', formData);
-      setError('');
-      navigate('/');
+    try {
+      await axios.post('http://localhost:8000/api/register', form, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      alert('User registered successfully!');
+      navigate('/admin'); // or wherever you want to go after registration
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      console.error('Registration failed:', err);
+      alert('Registration failed. Please check form or try again.');
     }
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card p-4 shadow-sm" style={{ maxWidth: '400px', width: '100%' }}>
-        <h3 className="text-center mb-4" style={{ color: '#0f214d' }}>Register</h3>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <form onSubmit={handleRegister}>
-          <div className="mb-3">
-            <label>Name</label>
-            <input type="text" name="name" className="form-control" required value={formData.name} onChange={handleChange} />
+    <div>
+       <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#0f214d' }}>
+        <div className="container-fluid d-flex justify-content-between">
+          <span className="navbar-brand">Register New User</span>
+          <div className=" d-flex ms-auto">
+            <button className="btn btn-outline-light me-4 col-md-4" id= "home-btn" onClick={() => navigate('/admin')}>Home</button>
+            <button className="btn btn-outline-light me-4 col-md-6" id= "add-user-btn" onClick={() => navigate('/admin/register-user')}>Add User</button>
           </div>
-          <div className="mb-3">
-            <label>Email address</label>
-            <input type="email" name="email" className="form-control" required value={formData.email} onChange={handleChange} />
-          </div>
-          <div className="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" className="form-control" required value={formData.password} onChange={handleChange} />
-          </div>
-          <button type="submit" className="btn w-100 text-white" style={{ backgroundColor: '#0f214d' }}>Register</button>
-          <div className="text-center mt-3">
-            <small>
-              Already have an account? <a href="/" style={{ color: '#0f214d' }}>Login</a>
-            </small>
-          </div>
-        </form>
+        </div>
+      </nav>
+      
+      <div className="container card p-4 mt-5">
+      <h4 className="mb-4">Register New User</h4>
+      <p className="text-muted">Please fill in the details below to register a new user.</p>
+      <form onSubmit={handleRegister}>
+        <div className="mb-3">
+          <label>Name</label>
+          <input type="text" className="form-control" name="name" value={form.name} onChange={handleChange} required />
+        </div>
+        <div className="mb-3">
+          <label>Email</label>
+          <input type="email" className="form-control" name="email" value={form.email} onChange={handleChange} required />
+        </div>
+        <div className="mb-3">
+          <label>Password</label>
+          <input type="password" className="form-control" name="password" value={form.password} onChange={handleChange} required />
+        </div>
+        <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#0f214d' }}>Register User</button>
+      </form>
       </div>
     </div>
   );
 }
 
-export default Register;
+export default RegisterUser;
