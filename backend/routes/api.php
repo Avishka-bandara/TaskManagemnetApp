@@ -18,7 +18,8 @@ Route::post('/login',[UserController::class, 'login']);
 // only user 
 Route::middleware(['auth:api', 'role:user'])->group(function () {
     Route::post('/update-profile', [UserController::class, 'UpdateUserProfile']);
-    
+    Route::get('/user-tasks', [TaskController::class, 'fetchUserTasks']);
+
 });
 
 

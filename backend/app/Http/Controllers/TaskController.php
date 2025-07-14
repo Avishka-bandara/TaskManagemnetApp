@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class TaskController extends Controller
@@ -83,6 +84,12 @@ class TaskController extends Controller
 
     public function fetchTasks(){
         $tasks = Task::with('user')->get(); 
+        return response()->json($tasks);
+    }
+
+
+    public function fetchUserTasks(){
+        $tasks = Task::with('user')->where('user_id', Auth::user()->id)->get(); 
         return response()->json($tasks);
     }
 }

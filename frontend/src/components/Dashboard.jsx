@@ -24,11 +24,7 @@ function Dashboard() {
         headers: { Authorization: `Bearer ${getToken()}` }
     };
 
-    useEffect(() => {
-        fetchUser();
-        fetchTasks();
-    }, []);
-
+    
     useEffect(() => {
         let timer;
         if (startTime && activeTaskId) {
@@ -52,7 +48,7 @@ function Dashboard() {
     const fetchTasks = async () => {
         try {
             setLoadingTasks(true);
-            const res = await axios.get('http://localhost:8000/api/user/tasks', config);
+            const res = await axios.get('http://localhost:8000/api/user-tasks', config);
             setTasks(res.data);
         } catch (err) {
             console.error('Fetch tasks failed', err);
@@ -78,6 +74,12 @@ function Dashboard() {
         }
     };
 
+    useEffect(() => {
+        fetchUser();
+        fetchTasks();
+    }, []);
+
+
 
     const handleUpdateProgress = async () => {
         if (!selectedTask || !status) return;
@@ -98,7 +100,7 @@ function Dashboard() {
                 }
             );
 
-            alert('Task updated successfully');
+            alert(res.data.message || 'Task updated successfully');
             if (status === "in_progress") {
                 setActiveTaskId(selectedTask.id);
                 setStartTime(Date.now());
@@ -118,7 +120,6 @@ function Dashboard() {
 
     return (
         <div>
-
             <nav className="navbar navbar-expand-lg navbar-dark mb-5" style={{ backgroundColor: '#0f214d' }}>
                 <div className="container-fluid">
                     <span className="navbar-brand">User Dashboard</span>
