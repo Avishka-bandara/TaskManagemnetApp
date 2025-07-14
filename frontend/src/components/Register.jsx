@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { getToken } from '../services/Auth';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 function RegisterUser() {
   const navigate = useNavigate();
@@ -19,11 +21,11 @@ function RegisterUser() {
           Authorization: `Bearer ${getToken()}`,
         },
       });
-      alert('User registered successfully!');
+      toast.success(axios.data.message || 'User registered successfully!');
       navigate('/admin'); // or wherever you want to go after registration
     } catch (err) {
       console.error('Registration failed:', err);
-      alert('Registration failed. Please check form or try again.');
+      toast.error(axios.data.message || 'Registration failed. Please check form or try again.');
     }
   };
 

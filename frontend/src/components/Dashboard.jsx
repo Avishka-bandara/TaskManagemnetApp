@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { removeToken, getToken } from '../services/Auth';
+import { toast } from 'react-toastify';
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -68,11 +69,12 @@ function Dashboard() {
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`http://localhost:8000/api/update-profile`, user, config);
-            alert('Profile updated successfully');
+            const res = await axios.post(`http://localhost:8000/api/update-profile`, user, config);
+            toast.success(res.data.message || 'Profile updated successfully');
+
         } catch (err) {
             console.error('Update failed', err);
-            alert('Profile update failed');
+            toast.error(err.response?.data?.message || 'Profile update failed');
         }
     };
 
@@ -110,7 +112,7 @@ function Dashboard() {
             fetchTasks();
         } catch (err) {
             console.error('Failed to update task', err);
-            alert('Failed to update task');
+            toast.error(err.response?.data?.message || 'Failed to update task');
         }
     };
 
