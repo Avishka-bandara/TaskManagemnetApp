@@ -58,7 +58,8 @@ Edit your `.env` and set DB credentials.
 ### 🗄️ Generate App Key
 
 ```bash
-php artisan key:generate
+php artisan jwt:secret
+
 ```
 
 ### 🛠️ Run Migrations & Seeder
