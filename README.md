@@ -84,7 +84,7 @@ php artisan serve
 ### 📂 Navigate to `frontend` folder
 
 ```bash
-cd ../frontend
+cd frontend
 ```
 
 ### 📦 Install Dependencies
