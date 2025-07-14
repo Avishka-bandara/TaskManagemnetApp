@@ -41,7 +41,7 @@ function Login() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div className=" d-flex justify-content-center align-items-center vh-100 bg-light">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '400px', width: '100%' }}>
         <h3 className="text-center mb-4" style={{ color: '#0f214d' }}>Login</h3>
         {error && <div className="alert alert-danger">{error}</div>}

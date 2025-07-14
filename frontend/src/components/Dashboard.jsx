@@ -9,7 +9,14 @@ function Dashboard() {
     const [user, setUser] = useState({ name: '', email: '' });
     const [tasks, setTasks] = useState([]);
     const [selectedTask, setSelectedTask] = useState(null);
-    const [progress, setProgress] = useState('');
+    const [status, setStatus] = useState('');
+    const [remarks, setRemarks] = useState('')
+    const [loadingTasks, setLoadingTasks] = useState(true);
+
+    // timer
+    const [activeTaskId, setActiveTaskId] = useState(null);
+    const [startTime, setStartTime] = useState(null);
+    const [elapsedTime, setElapsedTime] = useState(0);
 
     // Axios config with token
     const config = {
@@ -21,10 +28,20 @@ function Dashboard() {
         fetchTasks();
     }, []);
 
+    useEffect(() => {
+        let timer;
+        if (startTime && activeTaskId) {
+            timer = setInterval(() => {
+                setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [startTime, activeTaskId]);
+
 
     const fetchUser = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/fetch-auth', config);
+            const res = await axios.get('http://localhost:8000/api/fetch-user', config);
             setUser({ name: res.data.name, email: res.data.email });
         } catch (err) {
             console.error('Fetch user failed', err);
@@ -33,10 +50,13 @@ function Dashboard() {
 
     const fetchTasks = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/tasks', config);
+            setLoadingTasks(true);
+            const res = await axios.get('http://localhost:8000/api/user/tasks', config);
             setTasks(res.data);
         } catch (err) {
             console.error('Fetch tasks failed', err);
+        } finally {
+            setLoadingTasks(false);
         }
     };
 
@@ -48,7 +68,7 @@ function Dashboard() {
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8000/api/update-profile', user, config);
+            await axios.post(`http://localhost:8000/api/update-profile`, user, config);
             alert('Profile updated successfully');
         } catch (err) {
             console.error('Update failed', err);
@@ -58,13 +78,39 @@ function Dashboard() {
 
 
     const handleUpdateProgress = async () => {
-        if (!selectedTask) return;
+        if (!selectedTask || !status) return;
+        const timeSpent = status === "completed" ? elapsedTime : null;
         try {
-            await axios.post(`http://localhost:8000/api/task/${selectedTask.id}`, { progress }, config);
-            alert('Task progress updated!');
+            const token = localStorage.getItem('token');
+            const res = await axios.post(
+                `http://localhost:8000/api/task/${selectedTask.id}`,
+                {
+                    status,
+                    remarks,
+                    time_spent: timeSpent
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            alert('Task updated successfully');
+             if (status === "in_progress") {
+            setActiveTaskId(selectedTask.id);
+            setStartTime(Date.now());
+            setElapsedTime(0);
+            }
+
+            if (status === "completed") {
+                setActiveTaskId(null);
+                setStartTime(null);
+            }
             fetchTasks();
         } catch (err) {
-            console.error('Progress update failed', err);
+            console.error('Failed to update task', err);
+            alert('Failed to update task');
         }
     };
 
@@ -74,8 +120,16 @@ function Dashboard() {
             <nav className="navbar navbar-expand-lg navbar-dark mb-5" style={{ backgroundColor: '#0f214d' }}>
                 <div className="container-fluid">
                     <span className="navbar-brand">User Dashboard</span>
+                        {activeTaskId && (
+                        <div className="text-white me-3">
+                            <strong>Timer: </strong>
+                            {Math.floor(elapsedTime / 3600).toString().padStart(2, '0')}:
+                            {Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0')}:
+                            {(elapsedTime % 60).toString().padStart(2, '0')}
+                        </div>
+                        )}
                     <div className="ms-auto">
-                        <button className="btn btn-outline-light" onClick={handleLogout}>Logout</button>
+                        <button className="btn btn-outline-light" id="logout-btn" onClick={handleLogout}>Logout</button>
                     </div>
                 </div>
             </nav>
@@ -92,16 +146,16 @@ function Dashboard() {
                             </div>
                             <div className="col-md-5 mb-3">
                                 <label>Email</label>
-                                <input type="email" className="form-control" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} />
+                                <input type="email" className="form-control" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} disabled />
                             </div>
 
                             <div className="col-md-5 mb-3">
                                 <label>Password</label>
-                                <input type="password" className="form-control"  />
+                                <input type="password" className="form-control" />
                             </div>
 
                             <div className="col-md-3 mb-3 d-flex align-items-end">
-                                <button className="btn btn-success text-white w-100" >
+                                <button className="btn btn-success text-white w-100" style={{ backgroundColor: '#0f214d' }} >
                                     Update
                                 </button>
 
@@ -118,19 +172,44 @@ function Dashboard() {
                             <tr>
                                 <th>#</th>
                                 <th>Title</th>
+                                <th>Description</th>
                                 <th>Status</th>
-                                <th>Progress</th>
+                                <th>Start Date</th>
+                                <th>Due Date</th>
+                                <th>Remarks</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {tasks.length > 0 ? (
+                            {loadingTasks ? (
+                            <tr>
+                                <td colSpan="8" className="text-center">
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                                </td>
+                            </tr>
+                            ) :
+                            tasks.length > 0 ? (
                                 tasks.map((task, index) => (
                                     <tr key={task.id}>
                                         <td>{index + 1}</td>
                                         <td>{task.title}</td>
-                                        <td>{task.status}</td>
-                                        <td>{task.progress || 'Not Started'}</td>
+                                        <td>{task.description}</td>
+                                        <td>{task.status ? (
+                                            <span className={`badge 
+                                            ${task.status === 'pending' ? 'bg-warning text-dark' :
+                                                    task.status === 'in_progress' ? 'bg-info text-dark' :
+                                                        task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
+                                            `}>
+                                                {task.status.replace('_', ' ')}
+                                            </span>
+                                        ) : (
+                                            <span className="badge bg-primary">Not started</span>
+                                        )}</td>
+                                        <td>{new Date(task.start_date).toLocaleDateString()}</td>
+                                        <td>{new Date(task.due_date).toLocaleDateString()}</td>
+                                        <td>{task.remarks || '-'}</td>
                                         <td>
                                             <button
                                                 className="btn btn-sm btn-secondary"
@@ -138,10 +217,11 @@ function Dashboard() {
                                                 data-bs-target="#updateCanvas"
                                                 onClick={() => {
                                                     setSelectedTask(task);
-                                                    setProgress(task.progress || '');
+                                                    setStatus(task.status || '');
+                                                    setRemarks(task.remarks || '');
                                                 }}
                                             >
-                                                Update Progress
+                                                Update Status
                                             </button>
                                         </td>
                                     </tr>
@@ -163,14 +243,27 @@ function Dashboard() {
                 <div className="offcanvas-body">
                     {selectedTask ? (
                         <>
-                            <h6>Task: {selectedTask.title}</h6>
+                            <h5 style={{ textTransform: 'uppercase', color: '#c32727ff' }}>Task: {selectedTask.title}</h5>
                             <div className="mb-3 mt-3">
-                                <label>Progress</label>
-                                <input
+                                <label>Status</label>
+                                <select
                                     type="text"
                                     className="form-control"
-                                    value={progress}
-                                    onChange={(e) => setProgress(e.target.value)}
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                >
+                                    <option value="" disabled>Select Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="completed">Completed</option>
+
+                                </select>
+                                <label>Remarks</label>
+                                <textarea
+                                    type="text"
+                                    value={remarks}
+                                    className="form-control"
+                                    onChange={(e) => setRemarks(e.target.value)}
                                 />
                             </div>
                             <button
@@ -179,7 +272,7 @@ function Dashboard() {
                                 onClick={handleUpdateProgress}
                                 data-bs-dismiss="offcanvas"
                             >
-                                Save
+                                Update
                             </button>
                         </>
                     ) : (

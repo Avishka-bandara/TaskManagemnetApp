@@ -77,6 +77,14 @@ class UserController extends Controller
         return response()->json(['message' => 'User updated successfully', 'user' => $user], 200);
     }
 
+    public function UpdateUserProfile(Request $request)
+    {
+        $user = Auth::user();
+        $user->update($request->all());
+
+        return response()->json(['message' => 'Profile updated successfully', 'user' => $user], 200);
+    }
+
 
     public function deleteUser($id){
         $user = User::findOrFail($id);

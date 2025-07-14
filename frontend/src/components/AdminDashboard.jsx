@@ -207,7 +207,9 @@ const handleUpdateUser = async (e) => {
               <th>Title</th>
               <th>Assigned To</th>
               <th>Status</th>
+              <th>Start Date</th>
               <th>Due Date</th>
+              <th>Time Spent</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -239,7 +241,12 @@ const handleUpdateUser = async (e) => {
 
                 )}
                 </td>
+                <td>{task.start_date || 'N/A'}</td>
                 <td>{task.due_date}</td>
+                <td> {task.time_spent
+                  ? new Date(task.time_spent * 1000).toISOString().substr(11, 8)
+                  : 'N/A'}
+                </td>
                 <td>
                   <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(task.id)}>Delete</button>
                   <button className="btn btn-sm btn-secondary ms-2"  onClick={() => openEditCanvas(task)}>Edit</button>
@@ -247,7 +254,7 @@ const handleUpdateUser = async (e) => {
               </tr>
             )) : (
               <tr>
-                {/* <td colSpan="6" className="text-center">No tasks found</td> */}
+                <td colSpan="6" className="text-center">No tasks found</td>
               </tr>
             )}
             
