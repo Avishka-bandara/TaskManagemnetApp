@@ -5,6 +5,9 @@ import { getToken, removeToken } from '../services/Auth';
 import { useNavigate } from 'react-router-dom';
 import EditOffCanvas from './EditOffCanvas';
 import { toast } from 'react-toastify';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 
 
 function AdminDashboard() {
@@ -20,6 +23,7 @@ function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [dueDate, setDueDate] = useState(null);
 
 
 
@@ -210,10 +214,21 @@ function AdminDashboard() {
                 <label>Title</label>
                 <input type="text" name="title" className="form-control" required value={taskForm.title} onChange={handleTaskChange} />
               </div>
-
               <div className="col-sm-12 col-md-6 mb-3">
                 <label>Due Date</label>
-                <input type="date" name="due_date" className="form-control" required value={taskForm.due_date} onChange={handleTaskChange} />
+                <DatePicker
+                  selected={dueDate}
+                  onChange={(date) => {
+                    setDueDate(date);
+                    setTaskForm({ ...taskForm, due_date: date.toISOString().split('T')[0] });
+                  }}
+                  minDate={new Date()}
+                  dateFormat="yyyy-MM-dd"
+                  className="form-control"
+                  placeholderText="Select due date"
+                   wrapperClassName="w-100"
+                  required
+                />
               </div>
             </div>
             <div className="row">
@@ -295,10 +310,10 @@ function AdminDashboard() {
                   const filteredTasks = tasks.filter(
                     (task) => !statusFilter || task.status === statusFilter
                   )
-                  .filter((task) =>
-                    task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    task.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
+                    .filter((task) =>
+                      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      task.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
                   return filteredTasks.length > 0 ? filteredTasks.map((task, index) => (
                     <tr key={task.id}>
                       <td>{index + 1}</td>
@@ -343,7 +358,7 @@ function AdminDashboard() {
         {/* User Table */}
         <h4>All Users</h4>
         <div className='card p-3'>
-           <div className="d-flex justify-content-end mb-3">
+          <div className="d-flex justify-content-end mb-3">
             <input type="text" className="form-control w-auto" placeholder="Search by name or email" value={userSearchQuery}
               onChange={(e) => setUserSearchQuery(e.target.value)}
             />
@@ -367,23 +382,23 @@ function AdminDashboard() {
                     </div>
                   </td>
                 </tr>
-              ) :(
-              users
-                .filter((user) =>
-                  user.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
-                  user.email.toLowerCase().includes(userSearchQuery.toLowerCase())
-                )
-                .map((user, index) => (
-                  <tr key={user.id}>
-                    <td>{index + 1}</td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>
-                      <button className="btn btn-sm btn-danger" onClick={() => handleDeleteUser(user.id)}>Delete</button>
-                      <button className="btn btn-sm btn-secondary ms-2" onClick={() => openUserEditCanvas(user)}>Edit</button></td>
-                  </tr>
-                )) 
-                )}
+              ) : (
+                users
+                  .filter((user) =>
+                    user.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                    user.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                  )
+                  .map((user, index) => (
+                    <tr key={user.id}>
+                      <td>{index + 1}</td>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        <button className="btn btn-sm btn-danger" onClick={() => handleDeleteUser(user.id)}>Delete</button>
+                        <button className="btn btn-sm btn-secondary ms-2" onClick={() => openUserEditCanvas(user)}>Edit</button></td>
+                    </tr>
+                  ))
+              )}
             </tbody>
           </table>
         </div>

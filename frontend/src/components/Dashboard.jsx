@@ -104,7 +104,7 @@ function Dashboard() {
                 }
             );
 
-            alert(res.data.message || 'Task updated successfully');
+            toast.success(res.data.message || 'Task updated successfully');
             if (status === "in_progress") {
                 setActiveTaskId(selectedTask.id);
                 setStartTime(Date.now());

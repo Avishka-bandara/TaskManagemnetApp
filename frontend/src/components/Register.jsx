@@ -16,16 +16,16 @@ function RegisterUser() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/register', form, {
+      const res= await axios.post('http://localhost:8000/api/register', form, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
       });
-      toast.success(axios.data.message || 'User registered successfully!');
+      toast.success(res.data.message || 'User registered successfully!');
       navigate('/admin'); // or wherever you want to go after registration
     } catch (err) {
       console.error('Registration failed:', err);
-      toast.error(axios.data.message || 'Registration failed. Please check form or try again.');
+      toast.error(err.response?.data?.message || 'Registration failed. Please check form or try again.');
     }
   };
 
