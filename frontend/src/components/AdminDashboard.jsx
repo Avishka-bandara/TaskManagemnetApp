@@ -4,6 +4,8 @@ import axios from 'axios';
 import { getToken, removeToken } from '../services/Auth';
 import { useNavigate } from 'react-router-dom';
 import EditOffCanvas from './EditOffCanvas';
+import { toast } from 'react-toastify';
+
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -85,13 +87,13 @@ function AdminDashboard() {
   const handleCreateTask = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/task', taskForm, config);
-      // alert('Task created successfully');
+      const res = await axios.post('http://localhost:8000/api/task', taskForm, config);
+      toast.success(res.data.message || 'Task created successfully');
       setTaskForm({ title: '', description: '', due_date: '', assigned_user_id: '' });
       fetchTasks();
     } catch (err) {
       console.error('Failed to create task', err);
-      alert('Task creation failed');
+      toast.error(err.response?.data?.message || 'Task creation failed');
     }
   };
 
@@ -99,12 +101,24 @@ function AdminDashboard() {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/task/${taskId}`, config);
-      alert('Task deleted successfully');
+      const res = await axios.delete(`http://localhost:8000/api/task/${taskId}`, config);
+      toast.success(res.data.message || 'Task deleted successfully');
       fetchTasks(); // Refresh task list
     } catch (err) {
       console.error('Failed to delete task', err);
-      alert('Task deletion failed');
+      toast.error(err.response?.data?.message || 'Task deletion failed');
+    }
+  };
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+
+    try {
+      const res = await axios.delete(`http://localhost:8000/api/user/${userId}`, config);
+      toast.success(res.data.message || 'User deleted successfully');
+      fetchUsers(); // Refresh user list
+    } catch (err) {
+      console.error('Failed to delete user', err);
+      toast.error(err.response?.data?.message || 'User deletion failed');
     }
   };
   const handleUpdateTask = async (e) => {
@@ -113,25 +127,25 @@ function AdminDashboard() {
     try {
       await axios.post(`http://localhost:8000/api/task/${editingTask.id}`, editingTask, config);
 
-      alert('Task updated successfully');
-      setShowEdit(false); // close off-canvas
+      toast.success(axios.data.message || 'Task updated successfully');
+      setShowEdit(false);
       fetchTasks();       // refresh task list
     } catch (err) {
       console.error('Failed to update task', err);
-      alert('Task update failed');
+      toast.error(axios.data.message || 'Task update failed');
     }
   };
 
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://localhost:8000/api/update-user/${editingUser.id}`, editingUser, config); // Adjust route if needed
-      alert('User updated successfully');
+      const res = await axios.post(`http://localhost:8000/api/update-user/${editingUser.id}`, editingUser, config);
+      toast.success(res.data.message || 'User updated successfully');
       setShowUserEdit(false);
       fetchUsers(); // Re-fetch user list after update
     } catch (err) {
       console.error('Failed to update user', err);
-      alert('User update failed');
+      toast.error(err.response?.data?.message || 'User update failed');
     }
   };
 
@@ -365,7 +379,7 @@ function AdminDashboard() {
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>
-                      <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(user.id)}>Delete</button>
+                      <button className="btn btn-sm btn-danger" onClick={() => handleDeleteUser(user.id)}>Delete</button>
                       <button className="btn btn-sm btn-secondary ms-2" onClick={() => openUserEditCanvas(user)}>Edit</button></td>
                   </tr>
                 )) 
