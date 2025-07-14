@@ -40,7 +40,7 @@ class TaskController extends Controller
             $task = Task::findOrFail($id);
             $validate = $request->validate([
                 'status' => 'required|string|in:in_progress,completed',
-                'time_spent' => 'nullable|integer',
+                
     
             ]);
             $task->update([
