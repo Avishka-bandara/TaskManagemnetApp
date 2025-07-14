@@ -106,8 +106,8 @@ The app will open at `http://localhost:3000`
 ## 🔑 Default Admin Login
 
 ```text
-Email: admin@example.com
-Password: password
+Email: admin@admin.com
+Password: admin123
 ```
 
 ---
