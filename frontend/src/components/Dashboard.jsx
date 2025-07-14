@@ -97,10 +97,10 @@ function Dashboard() {
             );
 
             alert('Task updated successfully');
-             if (status === "in_progress") {
-            setActiveTaskId(selectedTask.id);
-            setStartTime(Date.now());
-            setElapsedTime(0);
+            if (status === "in_progress") {
+                setActiveTaskId(selectedTask.id);
+                setStartTime(Date.now());
+                setElapsedTime(0);
             }
 
             if (status === "completed") {
@@ -115,7 +115,7 @@ function Dashboard() {
     };
 
     return (
-        <div className="dashboard">
+        <div>
 
             <nav className="navbar navbar-expand-lg navbar-dark mb-5" style={{ backgroundColor: '#0f214d' }}>
                 <div className="container-fluid">
@@ -140,21 +140,21 @@ function Dashboard() {
                     <h4>Update Profile</h4>
                     <form onSubmit={handleProfileUpdate} className="mb-4">
                         <div className="row align-items-end">
-                            <div className="col-md-5 mb-3">
+                            <div className="col-sm-12 col-md-5 mb-3">
                                 <label>Name</label>
                                 <input type="text" className="form-control" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} />
                             </div>
-                            <div className="col-md-5 mb-3">
+                            <div className="col-sm-12 col-md-5 mb-3">
                                 <label>Email</label>
                                 <input type="email" className="form-control" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} disabled />
                             </div>
 
-                            <div className="col-md-5 mb-3">
+                            <div className="col-sm-12 col-md-5 mb-3">
                                 <label>Password</label>
                                 <input type="password" className="form-control" />
                             </div>
 
-                            <div className="col-md-3 mb-3 d-flex align-items-end">
+                            <div className="col-sm-12 col-md-3 mb-3 d-flex align-items-end">
                                 <button className="btn btn-success text-white w-100" style={{ backgroundColor: '#0f214d' }} >
                                     Update
                                 </button>
@@ -227,7 +227,7 @@ function Dashboard() {
                                     </tr>
                                 ))
                             ) : (
-                                <tr><td colSpan="5" style={{ textAlign: 'center' }}>No tasks assigned</td></tr>
+                                <tr><td colSpan="8" style={{ textAlign: 'center' }}>No tasks assigned</td></tr>
                             )}
                         </tbody>
                     </table>

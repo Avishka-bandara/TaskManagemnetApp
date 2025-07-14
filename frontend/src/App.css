@@ -71,9 +71,11 @@ body {
   /* flex-direction: column; */
   /* background-color: #a3a7ab; */
   animation: fadeInUp 0.6s ease-out;
-  min-width: 500px;
+  min-width: 519px;
   box-sizing: border-box;
+  /* max-width: fit-content; */
 }
+
 
 
 
@@ -87,4 +89,9 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+
+input.form-control:focus , textarea.form-control:focus , select.form-select:focus {
+  box-shadow: none; 
 }

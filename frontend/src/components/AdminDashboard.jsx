@@ -15,7 +15,9 @@ function AdminDashboard() {
   const [showUserEdit, setShowUserEdit] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [loadingTasks, setLoadingTasks] = useState(true);
-
+  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [userSearchQuery, setUserSearchQuery] = useState('');
 
 
 
@@ -234,107 +236,143 @@ function AdminDashboard() {
         </div>
 
         {/* Task Table */}
+
         <h4>All Tasks</h4>
-        <table className="table table-bordered table-striped mb-5 mt-3 align-middle text-center responsive">
-          <thead className="table-primary">
-            <tr>
-              <th>#</th>
-              <th>Title</th>
-              <th>Assigned To</th>
-              <th>Status</th>
-              <th>Start Date</th>
-              <th>Due Date</th>
-              <th>Time Spent</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loadingTasks ? (
+        <div className='card p-3 mb-5'>
+          <div className="d-flex justify-content-end mb-3">
+            <select
+              className="form-select w-auto"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            <input type="text" className="form-control w-auto" placeholder="Search by title or user" value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <table className="table table-bordered table-striped mt-3 align-middle text-center responsive ">
+            <thead className="table-primary">
               <tr>
-                <td colSpan="8" className="text-center">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </td>
+                <th>#</th>
+                <th>Title</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>Start Date</th>
+                <th>Due Date</th>
+                <th>Time Spent</th>
+                <th>Actions</th>
               </tr>
-            ) :
-              tasks.length > 0 ? tasks.map((task, index) => (
-                <tr key={task.id}>
-                  <td>{index + 1}</td>
-                  <td>{task.title}</td>
-                  <td>{task.user?.name || 'Unassigned'}</td>
-                  <td>{task.status ? (
-                    <span className={`badge 
-                      ${task.status === 'pending' ? 'bg-warning text-dark' :
-                        task.status === 'in_progress' ? 'bg-info text-dark' :
-                          task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
-                      `}>
-                      {task.status.replace('_', ' ')}
-                    </span>
-                  ) : (
-                    <span className="badge bg-primary">Not started</span>
-
-                  )}
-                  </td>
-                  <td>{task.start_date || 'N/A'}</td>
-                  <td>{task.due_date}</td>
-                  <td> {task.time_spent
-                    ? new Date(task.time_spent * 1000).toISOString().substr(11, 8)
-                    : 'N/A'}
-                  </td>
-                  <td>
-                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(task.id)}>Delete</button>
-                    <button className="btn btn-sm btn-secondary ms-2" onClick={() => openEditCanvas(task)}>Edit</button>
-                  </td>
-                </tr>
-              )) : (
+            </thead>
+            <tbody>
+              {loadingTasks ? (
                 <tr>
-                  <td colSpan="6" className="text-center">No tasks found</td>
+                  <td colSpan="8" className="text-center">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
                 </tr>
-              )}
+              ) : (
+                (() => {
+                  const filteredTasks = tasks.filter(
+                    (task) => !statusFilter || task.status === statusFilter
+                  )
+                  .filter((task) =>
+                    task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    task.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+                  return filteredTasks.length > 0 ? filteredTasks.map((task, index) => (
+                    <tr key={task.id}>
+                      <td>{index + 1}</td>
+                      <td>{task.title}</td>
+                      <td>{task.user?.name || 'Unassigned'}</td>
+                      <td>{task.status ? (
+                        <span className={`badge 
+                      ${task.status === 'pending' ? 'bg-warning text-dark' :
+                            task.status === 'in_progress' ? 'bg-info text-dark' :
+                              task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
+                          `}>
+                          {task.status.replace('_', ' ')}
+                        </span>
+                      ) : (
+                        <span className="badge bg-primary">Not started</span>
 
-          </tbody>
-        </table>
+                      )}
+                      </td>
+                      <td>{task.start_date || 'N/A'}</td>
+                      <td>{task.due_date}</td>
+                      <td> {task.time_spent
+                        ? new Date(task.time_spent * 1000).toISOString().substr(11, 8)
+                        : 'N/A'}
+                      </td>
+                      <td>
+                        <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(task.id)}>Delete</button>
+                        <button className="btn btn-sm btn-secondary ms-2" onClick={() => openEditCanvas(task)}>Edit</button>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="8" className="text-center">No tasks found</td>
+                    </tr>
+                  );
+                })()
+              )}
+            </tbody>
+          </table>
+        </div>
 
 
         {/* User Table */}
         <h4>All Users</h4>
-        <table className="table table-bordered table-striped mb-5 mt-3 align-middle text-center responsive">
-          <thead className="table-primary">
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Email</th>
-              {/* <th>Active</th> */}
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loadingTasks ? (
+        <div className='card p-3'>
+           <div className="d-flex justify-content-end mb-3">
+            <input type="text" className="form-control w-auto" placeholder="Search by name or email" value={userSearchQuery}
+              onChange={(e) => setUserSearchQuery(e.target.value)}
+            />
+          </div>
+          <table className="table table-bordered table-striped mb-5 mt-3 align-middle text-center responsive">
+            <thead className="table-primary">
               <tr>
-                <td colSpan="6" className="text-center">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </td>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                {/* <th>Active</th> */}
+                <th>Action</th>
               </tr>
-            ) :
-              users.length > 0 ? users.map((user, index) => (
-                <tr key={user.id}>
-                  <td>{index + 1}</td>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(user.id)}>Delete</button>
-                    <button className="btn btn-sm btn-secondary ms-2" onClick={() => openUserEditCanvas(user)}>Edit</button></td>
-                </tr>
-              )) : (
+            </thead>
+            <tbody>
+              {loadingTasks ? (
                 <tr>
-                  {/* <td colSpan="4" className="text-center">No users found</td> */}
+                  <td colSpan="6" className="text-center">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
                 </tr>
-              )}
-          </tbody>
-        </table>
+              ) :(
+              users
+                .filter((user) =>
+                  user.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                  user.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                )
+                .map((user, index) => (
+                  <tr key={user.id}>
+                    <td>{index + 1}</td>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(user.id)}>Delete</button>
+                      <button className="btn btn-sm btn-secondary ms-2" onClick={() => openUserEditCanvas(user)}>Edit</button></td>
+                  </tr>
+                )) 
+                )}
+            </tbody>
+          </table>
+        </div>
       </div>
       <EditOffCanvas
         show={showEdit}
