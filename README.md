@@ -27,7 +27,7 @@ A **web-based task management system** built with **React (frontend)** and **Lar
 ### 📁 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-repo/task-management-system.git
+git clone https://github.com/Avishka-bandara/TaskManagemnetApp.git
 cd task-management-system
 ```
 
