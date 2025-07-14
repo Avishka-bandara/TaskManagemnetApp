@@ -17,7 +17,7 @@ function AdminDashboard() {
   const [loadingTasks, setLoadingTasks] = useState(true);
 
 
-  
+
 
   const config = {
     headers: {
@@ -31,8 +31,8 @@ function AdminDashboard() {
   };
 
   const openUserEditCanvas = (user) => {
-  setEditingUser(user);
-  setShowUserEdit(true);
+    setEditingUser(user);
+    setShowUserEdit(true);
   };
 
 
@@ -45,8 +45,8 @@ function AdminDashboard() {
 
   const fetchTasks = async () => {
     try {
-      setLoadingTasks(true); 
-      const res = await axios.get('http://localhost:8000/api/user/tasks', config); 
+      setLoadingTasks(true);
+      const res = await axios.get('http://localhost:8000/api/user/tasks', config);
       setTasks(res.data);
     } catch (err) {
       console.error('Failed to fetch tasks', err);
@@ -57,7 +57,7 @@ function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      setLoadingTasks(true); 
+      setLoadingTasks(true);
       const res = await axios.get('http://localhost:8000/api/users', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -120,7 +120,7 @@ function AdminDashboard() {
     }
   };
 
-const handleUpdateUser = async (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
       await axios.post(`http://localhost:8000/api/update-user/${editingUser.id}`, editingUser, config); // Adjust route if needed
@@ -138,16 +138,51 @@ const handleUpdateUser = async (e) => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#0f214d' }}>
-        <div className="container-fluid d-flex justify-content-between">
+      <nav className="navbar navbar-expand-lg navbar-dark " style={{ backgroundColor: '#0f214d' }}>
+        <div className="container-fluid">
           <span className="navbar-brand">Admin Dashboard</span>
-          <div className=" d-flex ms-auto">
-            <button className="btn btn-outline-light me-4 col-md-3" id= "home-btn" href="/admin">Home</button>
-            <button className="btn btn-outline-light me-4 col-md-4" id= "add-user-btn" onClick={() => navigate('/admin/register-user')}>Add User</button>
-            <button className="btn btn-outline-light col-md-3" id= "logout-btn" onClick={handleLogout}>Logout</button>
+          {/* Toggler for mobile view */}
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+
+          {/* Collapsible content */}
+          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+            <div className="ms-auto d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
+              <button
+                className="btn btn-outline-light"
+                id="home-btn"
+                onClick={() => navigate('/admin')}
+              >
+                Home
+              </button>
+              <button
+                className="btn btn-outline-light"
+                id="add-user-btn"
+                onClick={() => navigate('/admin/register-user')}
+              >
+                Add User
+              </button>
+              <button
+                className="btn btn-outline-light"
+                id="logout-btn"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </nav>
+
 
       {/* Create Task Form */}
       <div className="container mt-4">
@@ -155,43 +190,43 @@ const handleUpdateUser = async (e) => {
           <h4>Create New Task</h4>
           <form onSubmit={handleCreateTask} className="mb-2">
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-sm-12 col-md-6 mb-3">
                 <label>Title</label>
                 <input type="text" name="title" className="form-control" required value={taskForm.title} onChange={handleTaskChange} />
               </div>
 
-              <div className="col-md-6 mb-3">
+              <div className="col-sm-12 col-md-6 mb-3">
                 <label>Due Date</label>
                 <input type="date" name="due_date" className="form-control" required value={taskForm.due_date} onChange={handleTaskChange} />
               </div>
             </div>
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-sm-12 col-md-6 mb-3">
                 <label>Description</label>
                 <textarea name="description" className="form-control" required value={taskForm.description} onChange={handleTaskChange}></textarea>
               </div>
-              <div className="col-md-6 mb-3">
-              <label>Assign To</label>
-              <Select
-                name="assigned_user_id"
-                options={users.map((user) => ({
-                  value: user.id,
-                  label: `${user.name} (${user.email})`
-                }))}
-                value={
-                  users
-                    .map((user) => ({
-                      value: user.id,
-                      label: `${user.name} (${user.email})`
-                    }))
-                    .find((option) => option.value === taskForm.assigned_user_id) || null
-                }
-                onChange={(selectedOption) =>
-                  setTaskForm({ ...taskForm, assigned_user_id: selectedOption?.value || '' })
-                }
-                isClearable
-                placeholder="Select User"
-              />
+              <div className="col-sm-12 col-md-6 mb-3">
+                <label>Assign To</label>
+                <Select
+                  name="assigned_user_id"
+                  options={users.map((user) => ({
+                    value: user.id,
+                    label: `${user.name} (${user.email})`
+                  }))}
+                  value={
+                    users
+                      .map((user) => ({
+                        value: user.id,
+                        label: `${user.name} (${user.email})`
+                      }))
+                      .find((option) => option.value === taskForm.assigned_user_id) || null
+                  }
+                  onChange={(selectedOption) =>
+                    setTaskForm({ ...taskForm, assigned_user_id: selectedOption?.value || '' })
+                  }
+                  isClearable
+                  placeholder="Select User"
+                />
               </div>
             </div>
             <button type="submit" className="btn text-white col-md-2" style={{ backgroundColor: '#0f214d' }}>Create Task</button>
@@ -200,7 +235,7 @@ const handleUpdateUser = async (e) => {
 
         {/* Task Table */}
         <h4>All Tasks</h4>
-        <table className="table table-bordered table-striped mb-5 mt-3 align-middle text-center ">
+        <table className="table table-bordered table-striped mb-5 mt-3 align-middle text-center responsive">
           <thead className="table-primary">
             <tr>
               <th>#</th>
@@ -216,55 +251,55 @@ const handleUpdateUser = async (e) => {
           <tbody>
             {loadingTasks ? (
               <tr>
-                <td colSpan="6" className="text-center">
+                <td colSpan="8" className="text-center">
                   <div className="spinner-border text-primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </td>
               </tr>
-            ) : 
-            tasks.length > 0 ? tasks.map((task, index) => (
-              <tr key={task.id}>
-                <td>{index + 1}</td>
-                <td>{task.title}</td>
-                <td>{task.user?.name || 'Unassigned'}</td>
-                <td>{task.status ? (
-                  <span className={`badge 
+            ) :
+              tasks.length > 0 ? tasks.map((task, index) => (
+                <tr key={task.id}>
+                  <td>{index + 1}</td>
+                  <td>{task.title}</td>
+                  <td>{task.user?.name || 'Unassigned'}</td>
+                  <td>{task.status ? (
+                    <span className={`badge 
                       ${task.status === 'pending' ? 'bg-warning text-dark' :
-                      task.status === 'in_progress' ? 'bg-info text-dark' :
-                        task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
+                        task.status === 'in_progress' ? 'bg-info text-dark' :
+                          task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
                       `}>
-                    {task.status.replace('_', ' ')}
-                  </span>
-                ) : (
-                <span className="badge bg-primary">Not started</span>
+                      {task.status.replace('_', ' ')}
+                    </span>
+                  ) : (
+                    <span className="badge bg-primary">Not started</span>
 
-                )}
-                </td>
-                <td>{task.start_date || 'N/A'}</td>
-                <td>{task.due_date}</td>
-                <td> {task.time_spent
-                  ? new Date(task.time_spent * 1000).toISOString().substr(11, 8)
-                  : 'N/A'}
-                </td>
-                <td>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(task.id)}>Delete</button>
-                  <button className="btn btn-sm btn-secondary ms-2"  onClick={() => openEditCanvas(task)}>Edit</button>
-                </td>
-              </tr>
-            )) : (
-              <tr>
-                <td colSpan="6" className="text-center">No tasks found</td>
-              </tr>
-            )}
-            
+                  )}
+                  </td>
+                  <td>{task.start_date || 'N/A'}</td>
+                  <td>{task.due_date}</td>
+                  <td> {task.time_spent
+                    ? new Date(task.time_spent * 1000).toISOString().substr(11, 8)
+                    : 'N/A'}
+                  </td>
+                  <td>
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(task.id)}>Delete</button>
+                    <button className="btn btn-sm btn-secondary ms-2" onClick={() => openEditCanvas(task)}>Edit</button>
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan="6" className="text-center">No tasks found</td>
+                </tr>
+              )}
+
           </tbody>
         </table>
-        
+
 
         {/* User Table */}
         <h4>All Users</h4>
-        <table className="table table-bordered table-striped align-middle text-center">
+        <table className="table table-bordered table-striped mb-5 mt-3 align-middle text-center responsive">
           <thead className="table-primary">
             <tr>
               <th>#</th>
@@ -275,7 +310,7 @@ const handleUpdateUser = async (e) => {
             </tr>
           </thead>
           <tbody>
-             {loadingTasks ? (
+            {loadingTasks ? (
               <tr>
                 <td colSpan="6" className="text-center">
                   <div className="spinner-border text-primary" role="status">
@@ -283,74 +318,74 @@ const handleUpdateUser = async (e) => {
                   </div>
                 </td>
               </tr>
-            ) : 
-            users.length > 0 ? users.map((user, index) => (
-              <tr key={user.id}>
-                <td>{index + 1}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(user.id)}>Delete</button>
-                  <button className="btn btn-sm btn-secondary ms-2"  onClick={() => openUserEditCanvas(user)}>Edit</button></td>
-              </tr>
-            )) : (
-              <tr>
-                {/* <td colSpan="4" className="text-center">No users found</td> */}
-              </tr>
-            )}
+            ) :
+              users.length > 0 ? users.map((user, index) => (
+                <tr key={user.id}>
+                  <td>{index + 1}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteTask(user.id)}>Delete</button>
+                    <button className="btn btn-sm btn-secondary ms-2" onClick={() => openUserEditCanvas(user)}>Edit</button></td>
+                </tr>
+              )) : (
+                <tr>
+                  {/* <td colSpan="4" className="text-center">No users found</td> */}
+                </tr>
+              )}
           </tbody>
         </table>
       </div>
-        <EditOffCanvas
-          show={showEdit}
-          title="Edit Task"
-          data={editingTask}
-          setData={setEditingTask}
-          onClose={() => setShowEdit(false)}
-          onSubmit={handleUpdateTask}
-          fields={[
-            { label: 'Title', name: 'title', type: 'text' },
-            { label: 'Description', name: 'description', type: 'textarea' },
-            { label: 'Due Date', name: 'due_date', type: 'date' },
-          ]}
-          dropdowns={[
-            {
-              label: 'Assign To',
-              name: 'user_id',
-              placeholder: 'Select User',
-              options: users,
-              display: (u) => `${u.name} (${u.email})`,
-            },
-          ]}
-        />
+      <EditOffCanvas
+        show={showEdit}
+        title="Edit Task"
+        data={editingTask}
+        setData={setEditingTask}
+        onClose={() => setShowEdit(false)}
+        onSubmit={handleUpdateTask}
+        fields={[
+          { label: 'Title', name: 'title', type: 'text' },
+          { label: 'Description', name: 'description', type: 'textarea' },
+          { label: 'Due Date', name: 'due_date', type: 'date' },
+        ]}
+        dropdowns={[
+          {
+            label: 'Assign To',
+            name: 'user_id',
+            placeholder: 'Select User',
+            options: users,
+            display: (u) => `${u.name} (${u.email})`,
+          },
+        ]}
+      />
 
 
 
-        <EditOffCanvas
-          show={showUserEdit}
-          title="Edit User"
-          data={editingUser}
-          setData={setEditingUser}
-          onClose={() => setShowUserEdit(false)}
-          onSubmit={handleUpdateUser}
-          fields={[
-            { label: 'Name', name: 'name', type: 'text' },
-            { label: 'Email', name: 'email', type: 'email' },
-          ]}
-          dropdowns={[
-            {
-              label: 'Role',
-              name: 'role',
-              placeholder: 'Select Role',
-              options: [
-                { id: 'admin', name: 'Admin' },
-                { id: 'user', name: 'User' },
-              ],
-              display: (r) => r.name,
-            },
-          ]}
+      <EditOffCanvas
+        show={showUserEdit}
+        title="Edit User"
+        data={editingUser}
+        setData={setEditingUser}
+        onClose={() => setShowUserEdit(false)}
+        onSubmit={handleUpdateUser}
+        fields={[
+          { label: 'Name', name: 'name', type: 'text' },
+          { label: 'Email', name: 'email', type: 'email' },
+        ]}
+        dropdowns={[
+          {
+            label: 'Role',
+            name: 'role',
+            placeholder: 'Select Role',
+            options: [
+              { id: 'admin', name: 'Admin' },
+              { id: 'user', name: 'User' },
+            ],
+            display: (r) => r.name,
+          },
+        ]}
       />
     </div>
-);
+  );
 }
 export default AdminDashboard;
