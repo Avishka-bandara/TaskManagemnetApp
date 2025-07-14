@@ -16,10 +16,11 @@ class Task extends Model
         'title',
         'description',
         'status',
-        'remarks',
         'start_date',
         'due_date',
         'user_id',
+        'remarks',
+        'time_spent',
     ];
 
     public function user(){
