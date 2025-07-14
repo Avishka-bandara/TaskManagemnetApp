@@ -12,6 +12,7 @@ function Dashboard() {
     const [selectedTask, setSelectedTask] = useState(null);
     const [status, setStatus] = useState('');
     const [remarks, setRemarks] = useState('')
+    const [loading, setLoading] = useState(false);
     const [loadingTasks, setLoadingTasks] = useState(true);
 
     // timer
@@ -24,7 +25,7 @@ function Dashboard() {
         headers: { Authorization: `Bearer ${getToken()}` }
     };
 
-    
+
     useEffect(() => {
         let timer;
         if (startTime && activeTaskId) {
@@ -64,6 +65,7 @@ function Dashboard() {
 
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const res = await axios.post(`http://localhost:8000/api/update-profile`, user, config);
             toast.success(res.data.message || 'Profile updated successfully');
@@ -71,6 +73,8 @@ function Dashboard() {
         } catch (err) {
             console.error('Update failed', err);
             toast.error(err.response?.data?.message || 'Profile update failed');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -123,14 +127,14 @@ function Dashboard() {
             <nav className="navbar navbar-expand-lg navbar-dark mb-5" style={{ backgroundColor: '#0f214d' }}>
                 <div className="container-fluid">
                     <span className="navbar-brand">User Dashboard</span>
-                        {activeTaskId && (
+                    {activeTaskId && (
                         <div className="text-white me-3">
                             <strong>Timer: </strong>
                             {Math.floor(elapsedTime / 3600).toString().padStart(2, '0')}:
                             {Math.floor((elapsedTime % 3600) / 60).toString().padStart(2, '0')}:
                             {(elapsedTime % 60).toString().padStart(2, '0')}
                         </div>
-                        )}
+                    )}
                     <div className="ms-auto">
                         <button className="btn btn-outline-light" id="logout-btn" onClick={handleLogout}>Logout</button>
                     </div>
@@ -158,8 +162,16 @@ function Dashboard() {
                             </div>
 
                             <div className="col-sm-12 col-md-3 mb-3 d-flex align-items-end">
-                                <button className="btn btn-success text-white w-100" style={{ backgroundColor: '#0f214d' }} >
-                                    Update
+                                <button className="btn btn-success text-white w-100" style={{ backgroundColor: '#0f214d' }} disabled={loading}>
+                                    {loading && (
+                                        <div
+                                            className="spinner-grow spinner-grow-sm me-2 text-white"
+                                            role="status"
+                                        >
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    )}
+                                    {loading ? 'Updating...' : 'Update'}
                                 </button>
 
                             </div>
@@ -185,53 +197,53 @@ function Dashboard() {
                         </thead>
                         <tbody>
                             {loadingTasks ? (
-                            <tr>
-                                <td colSpan="8" className="text-center">
-                                <div className="spinner-border text-primary" role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colSpan="8" className="text-center">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
                             ) :
-                            tasks.length > 0 ? (
-                                tasks.map((task, index) => (
-                                    <tr key={task.id}>
-                                        <td>{index + 1}</td>
-                                        <td>{task.title}</td>
-                                        <td>{task.description}</td>
-                                        <td>{task.status ? (
-                                            <span className={`badge 
+                                tasks.length > 0 ? (
+                                    tasks.map((task, index) => (
+                                        <tr key={task.id}>
+                                            <td>{index + 1}</td>
+                                            <td>{task.title}</td>
+                                            <td>{task.description}</td>
+                                            <td>{task.status ? (
+                                                <span className={`badge 
                                             ${task.status === 'pending' ? 'bg-warning text-dark' :
-                                                    task.status === 'in_progress' ? 'bg-info text-dark' :
-                                                        task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
+                                                        task.status === 'in_progress' ? 'bg-info text-dark' :
+                                                            task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
                                             `}>
-                                                {task.status.replace('_', ' ')}
-                                            </span>
-                                        ) : (
-                                            <span className="badge bg-primary">Not started</span>
-                                        )}</td>
-                                        <td>{new Date(task.start_date).toLocaleDateString()}</td>
-                                        <td>{new Date(task.due_date).toLocaleDateString()}</td>
-                                        <td>{task.remarks || '-'}</td>
-                                        <td>
-                                            <button
-                                                className="btn btn-sm btn-secondary"
-                                                data-bs-toggle="offcanvas"
-                                                data-bs-target="#updateCanvas"
-                                                onClick={() => {
-                                                    setSelectedTask(task);
-                                                    setStatus(task.status || '');
-                                                    setRemarks(task.remarks || '');
-                                                }}
-                                            >
-                                                Update Status
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr><td colSpan="8" style={{ textAlign: 'center' }}>No tasks assigned</td></tr>
-                            )}
+                                                    {task.status.replace('_', ' ')}
+                                                </span>
+                                            ) : (
+                                                <span className="badge bg-primary">Not started</span>
+                                            )}</td>
+                                            <td>{new Date(task.start_date).toLocaleDateString()}</td>
+                                            <td>{new Date(task.due_date).toLocaleDateString()}</td>
+                                            <td>{task.remarks || '-'}</td>
+                                            <td>
+                                                <button
+                                                    className="btn btn-sm btn-secondary"
+                                                    data-bs-toggle="offcanvas"
+                                                    data-bs-target="#updateCanvas"
+                                                    onClick={() => {
+                                                        setSelectedTask(task);
+                                                        setStatus(task.status || '');
+                                                        setRemarks(task.remarks || '');
+                                                    }}
+                                                >
+                                                    Update Status
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan="8" style={{ textAlign: 'center' }}>No tasks assigned</td></tr>
+                                )}
                         </tbody>
                     </table>
                 </div>
