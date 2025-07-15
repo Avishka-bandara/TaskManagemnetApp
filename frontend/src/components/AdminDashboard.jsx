@@ -7,6 +7,7 @@ import EditOffCanvas from './EditOffCanvas';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import Swal from 'sweetalert2';
 
 
 
@@ -102,28 +103,54 @@ function AdminDashboard() {
   };
 
   const handleDeleteTask = async (taskId) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
-
-    try {
-      const res = await axios.delete(`http://localhost:8000/api/task/${taskId}`, config);
-      toast.success(res.data.message || 'Task deleted successfully');
-      fetchTasks(); // Refresh task list
-    } catch (err) {
-      console.error('Failed to delete task', err);
-      toast.error(err.response?.data?.message || 'Task deletion failed');
-    }
+    // if (!window.confirm('Are you sure you want to delete this task?')) return;
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This User will be deleted permanently!",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6', 
+    }).then(async (result)=> {
+      if(result.isConfirmed) {
+        try {
+          const res = await axios.delete(`http://localhost:8000/api/task/${taskId}`, config);
+          // Swal.fire('Deleted!', res.data.message || 'User deleted successfully.', 'success');
+          toast.success(res.data.message || 'Task deleted successfully');
+          fetchTasks(); // Refresh task list
+        } catch (err) {
+          console.error('Failed to delete task', err);
+          Swal.fire('Error', err.response?.data?.message || 'User deletion failed.', 'error');
+          // toast.error(err.response?.data?.message || 'Task deletion failed');
+        }
+      }
+    });
   };
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
-
-    try {
-      const res = await axios.delete(`http://localhost:8000/api/user/${userId}`, config);
-      toast.success(res.data.message || 'User deleted successfully');
-      fetchUsers(); // Refresh user list
-    } catch (err) {
-      console.error('Failed to delete user', err);
-      toast.error(err.response?.data?.message || 'User deletion failed');
-    }
+    // if (!window.confirm('Are you sure you want to delete this user?')) return;
+     Swal.fire({
+      title: 'Are you sure?',
+      text: "This Task will be deleted permanently!",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6', 
+    }).then(async (result)=> {
+      if(result.isConfirmed){
+        try {
+          const res = await axios.delete(`http://localhost:8000/api/user/${userId}`, config);
+          toast.success(res.data.message || 'User deleted successfully');
+          fetchUsers(); // Refresh user list
+        } catch (err) {
+          console.error('Failed to delete user', err);
+          toast.error(err.response?.data?.message || 'User deletion failed');
+        }
+      }
+    });
   };
   const handleUpdateTask = async (e) => {
     e.preventDefault();
