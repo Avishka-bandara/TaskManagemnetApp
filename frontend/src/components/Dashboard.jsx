@@ -182,70 +182,72 @@ function Dashboard() {
                 {/* Task Table */}
                 <div className="mt-5">
                     <h4>My Tasks</h4>
-                    <table className=" table table-bordered table-striped">
-                        <thead className="table-primary">
-                            <tr>
-                                <th>#</th>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Status</th>
-                                <th>Start Date</th>
-                                <th>Due Date</th>
-                                <th>Remarks</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loadingTasks ? (
+                    <div className="table-responsive-scroll " style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        <table className=" table table-bordered table-striped">
+                            <thead className="table-primary">
                                 <tr>
-                                    <td colSpan="8" className="text-center">
-                                        <div className="spinner-border text-primary" role="status">
-                                            <span className="visually-hidden">Loading...</span>
-                                        </div>
-                                    </td>
+                                    <th>#</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Start Date</th>
+                                    <th>Due Date</th>
+                                    <th>Remarks</th>
+                                    <th>Action</th>
                                 </tr>
-                            ) :
-                                tasks.length > 0 ? (
-                                    tasks.map((task, index) => (
-                                        <tr key={task.id}>
-                                            <td>{index + 1}</td>
-                                            <td>{task.title}</td>
-                                            <td>{task.description}</td>
-                                            <td>{task.status ? (
-                                                <span className={`badge 
+                            </thead>
+                            <tbody>
+                                {loadingTasks ? (
+                                    <tr>
+                                        <td colSpan="8" className="text-center">
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) :
+                                    tasks.length > 0 ? (
+                                        tasks.map((task, index) => (
+                                            <tr key={task.id}>
+                                                <td>{index + 1}</td>
+                                                <td>{task.title}</td>
+                                                <td>{task.description}</td>
+                                                <td>{task.status ? (
+                                                    <span className={`badge 
                                             ${task.status === 'pending' ? 'bg-warning text-dark' :
-                                                        task.status === 'in_progress' ? 'bg-info text-dark' :
-                                                            task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
+                                                            task.status === 'in_progress' ? 'bg-info text-dark' :
+                                                                task.status === 'completed' ? 'bg-success' : 'bg-secondary'}
                                             `}>
-                                                    {task.status.replace('_', ' ')}
-                                                </span>
-                                            ) : (
-                                                <span className="badge bg-primary">Not started</span>
-                                            )}</td>
-                                            <td>{new Date(task.start_date).toLocaleDateString()}</td>
-                                            <td>{new Date(task.due_date).toLocaleDateString()}</td>
-                                            <td>{task.remarks || '-'}</td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-sm btn-secondary"
-                                                    data-bs-toggle="offcanvas"
-                                                    data-bs-target="#updateCanvas"
-                                                    onClick={() => {
-                                                        setSelectedTask(task);
-                                                        setStatus(task.status || '');
-                                                        setRemarks(task.remarks || '');
-                                                    }}
-                                                >
-                                                    Update Status
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr><td colSpan="8" style={{ textAlign: 'center' }}>No tasks assigned</td></tr>
-                                )}
-                        </tbody>
-                    </table>
+                                                        {task.status.replace('_', ' ')}
+                                                    </span>
+                                                ) : (
+                                                    <span className="badge bg-primary">Not started</span>
+                                                )}</td>
+                                                <td>{new Date(task.start_date).toLocaleDateString()}</td>
+                                                <td>{new Date(task.due_date).toLocaleDateString()}</td>
+                                                <td>{task.remarks || '-'}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-sm btn-secondary"
+                                                        data-bs-toggle="offcanvas"
+                                                        data-bs-target="#updateCanvas"
+                                                        onClick={() => {
+                                                            setSelectedTask(task);
+                                                            setStatus(task.status || '');
+                                                            setRemarks(task.remarks || '');
+                                                        }}
+                                                    >
+                                                        Update Status
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr><td colSpan="8" style={{ textAlign: 'center' }}>No tasks assigned</td></tr>
+                                    )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
