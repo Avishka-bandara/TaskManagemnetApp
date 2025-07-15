@@ -20,6 +20,7 @@ function AdminDashboard() {
   const [editingTask, setEditingTask] = useState(null);
   const [showUserEdit, setShowUserEdit] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -91,6 +92,7 @@ function AdminDashboard() {
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await axios.post('http://localhost:8000/api/task', taskForm, config);
       toast.success(res.data.message || 'Task created successfully');
@@ -99,6 +101,8 @@ function AdminDashboard() {
     } catch (err) {
       console.error('Failed to create task', err);
       toast.error(err.response?.data?.message || 'Task creation failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,9 +116,9 @@ function AdminDashboard() {
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No',
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6', 
-    }).then(async (result)=> {
-      if(result.isConfirmed) {
+      cancelButtonColor: '#3085d6',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
         try {
           const res = await axios.delete(`http://localhost:8000/api/task/${taskId}`, config);
           // Swal.fire('Deleted!', res.data.message || 'User deleted successfully.', 'success');
@@ -130,7 +134,7 @@ function AdminDashboard() {
   };
   const handleDeleteUser = async (userId) => {
     // if (!window.confirm('Are you sure you want to delete this user?')) return;
-     Swal.fire({
+    Swal.fire({
       title: 'Are you sure?',
       text: "This Task will be deleted permanently!",
       icon: 'question',
@@ -138,9 +142,9 @@ function AdminDashboard() {
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No',
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6', 
-    }).then(async (result)=> {
-      if(result.isConfirmed){
+      cancelButtonColor: '#3085d6',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
         try {
           const res = await axios.delete(`http://localhost:8000/api/user/${userId}`, config);
           toast.success(res.data.message || 'User deleted successfully');
@@ -253,7 +257,7 @@ function AdminDashboard() {
                   dateFormat="yyyy-MM-dd"
                   className="form-control"
                   placeholderText="Select due date"
-                   wrapperClassName="w-100"
+                  wrapperClassName="w-100"
                   required
                 />
               </div>
@@ -287,7 +291,16 @@ function AdminDashboard() {
                 />
               </div>
             </div>
-            <button type="submit" className="btn text-white col-md-2" style={{ backgroundColor: '#0f214d' }}>Create Task</button>
+            <button type="submit" className="btn text-white col-md-2" style={{ backgroundColor: '#0f214d' }} disabled={loading}>
+              {loading && (
+                <div
+                  className="spinner-grow spinner-grow-sm me-2 text-white"
+                  role="status"
+                >
+                  <span className="visually-hidden">creating...</span>
+                </div>
+              )}
+              {loading ? 'Creating...' : 'Create Task'}</button>
           </form>
         </div>
 
